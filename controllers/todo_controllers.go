@@ -59,3 +59,33 @@ func DeleteTodo(w http.ResponseWriter, r *http.Request) {
 
 	http.Error(w, "Задача не найдена", http.StatusNotFound)
 }
+
+func UpdateTodo(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+
+	idInt, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Неверный ID", http.StatusBadRequest) 
+		return
+	}
+
+	var updateTask models.Todo
+	err = json.NewDecoder(r.Body).Decode(&updateTask)
+	if err != nil {
+		http.Error(w, "Неверный формат данных", http.StatusBadRequest)
+		return
+	}
+
+	for i, task := range Tasks {
+		if task.ID == idInt {
+			Tasks[i].Title = updateTask.Title
+			Tasks[i].Completed = updateTask.Completed
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(Tasks[i])
+			return
+		}
+	}
+
+	http.Error(w, "Задача не найдена", http.StatusNotFound)
+	
+}
