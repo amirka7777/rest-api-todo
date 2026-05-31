@@ -6,6 +6,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"todo-api/models"
 )
 
@@ -37,4 +38,24 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newTodo)
+}
+
+func DeleteTodo(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	
+	idInt, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Неверный ID", http.StatusBadRequest)
+		return
+	}
+
+	for i, task := range Tasks {
+		if task.ID == idInt {
+			Tasks = append(Tasks[:i], Tasks[i+1:]... )
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+	}
+
+	http.Error(w, "Задача не найдена", http.StatusNotFound)
 }

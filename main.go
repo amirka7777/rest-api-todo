@@ -11,6 +11,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /todos", controllers.GetTodos)
 	mux.HandleFunc("POST /todos", controllers.CreateTodo)
+	mux.HandleFunc("DELETE /todos/{id}", controllers.DeleteTodo)
 	fmt.Println("Сервер запущен на порту: 8080")
 	
 	if err := http.ListenAndServe(":8080", mux); err != nil {
