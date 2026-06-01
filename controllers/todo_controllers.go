@@ -7,12 +7,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 	"todo-api/models"
 )
 
 var Tasks []models.Todo = []models.Todo{
-	{ID: 1, Title: "Покушать", Completed: true },
-	{ID: 2, Title: "Сделать уроки", Completed: false},
+	{ID: 1, Title: "Покушать", Completed: true, CreatedAt: time.Now() },
+	{ID: 2, Title: "Сделать уроки", Completed: false, CreatedAt: time.Now()},
 }
 
 var CurrentID int = 2
@@ -33,6 +34,7 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 
 	CurrentID++
 	newTodo.ID = CurrentID
+	newTodo.CreatedAt = time.Now()
 	Tasks = append(Tasks, newTodo)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -60,7 +62,7 @@ func DeleteTodo(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Задача не найдена", http.StatusNotFound)
 }
 
-func UpdateTodo(w http.ResponseWriter, r *http.Request) {
+func PatchTodo(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 
 	idInt, err := strconv.Atoi(idStr)
