@@ -5,9 +5,25 @@ import (
 	"todo-api/models"
 )
 
-func GetAllTodos() ([]models.Todo, error) {
+func GetAllTodos(search string, completed *bool) ([]models.Todo, error) {
 
-	rows, err := database.DB.Query("SELECT id, title, completed, created_at FROM todos")
+	query := "SELECT id, title, completed, created_at FROM todos WHERE 1=1"
+	var args []interface{}
+
+	if search != "" {
+		query += " AND title LIKE ?"
+		args = append(args, "%"+search+"%")
+	}
+
+	if completed != nil {
+		query += " AND completed = ?"
+		args = append(args, *completed)
+	}
+
+	query += " ORDER BY created_at DESC"
+
+
+	rows, err := database.DB.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}

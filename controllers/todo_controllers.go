@@ -12,9 +12,23 @@ import (
 func GetTodos(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	
-	tasks, err := repository.GetAllTodos()
+	queryParameters := r.URL.Query()
+	search := queryParameters.Get("search")
+	completed_str := queryParameters.Get("completed")
+
+	var filterON *bool
+	if completed_str != "" {
+		b ,err := strconv.ParseBool(completed_str)
+		if err != nil {
+			http.Error(w, "Неверное значение completed", http.StatusBadRequest)
+			return
+		}
+		filterON = &b
+	}
+
+	tasks, err := repository.GetAllTodos(search, filterON)
 	if err != nil {
-		http.Error(w, "Ошибка при получении данных из базы данных", http.StatusInternalServerError)
+		http.Error(w, "Ошибка при получении задач из базы данных", http.StatusInternalServerError)
 		return
 	}
 
